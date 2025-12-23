@@ -3,6 +3,7 @@ import os
 from os import path as osp
 from legged_gym.utils.helpers import merge_dict
 from legged_gym.envs.a1.a1_field_config import A1FieldCfg, A1FieldCfgPPO
+import torch
 
 go1_const_dof_range = dict(
     Hip_max= 1.047,
@@ -29,6 +30,8 @@ class Go1FieldCfg( A1FieldCfg ):
             latency_range = [0.04-0.0025, 0.04+0.0075] # comment this if it is too hard to train.
 
     class terrain( A1FieldCfg.terrain ):
+        # 添加代码mesh_type
+        mesh_type = None
         num_rows = 20
         num_cols = 80
 
@@ -156,6 +159,12 @@ class Go1FieldCfg( A1FieldCfg ):
             clip_actions_low.append( (go1_const_dof_range[sdk_joint_name + "_min"] + dof_pos_redundancy - A1FieldCfg.init_state.default_joint_angles[sim_joint_name]) / go1_action_scale )
             clip_actions_high.append( (go1_const_dof_range[sdk_joint_name + "_max"] - dof_pos_redundancy - A1FieldCfg.init_state.default_joint_angles[sim_joint_name]) / go1_action_scale )
         del dof_pos_redundancy, sdk_joint_name, sim_joint_name
+
+        class obs_scales( A1FieldCfg.normalization.obs_scales ):
+            # 添加代码为：将父类的 list 改为 np.array
+            base_pose = torch.tensor([0., 0., 0., 1., 1., 1.]) 
+            forward_depth = 1.
+            engaging_block = 1.
 
     class sim( A1FieldCfg.sim ):
         body_measure_points = { # transform are related to body frame

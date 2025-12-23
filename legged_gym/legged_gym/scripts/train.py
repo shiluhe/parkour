@@ -39,7 +39,7 @@ from legged_gym.utils import get_args
 from legged_gym.utils.task_registry import task_registry
 import torch
 
-from legged_gym.debugger import break_into_debugger
+#from legged_gym.debugger import break_into_debugger
 
 def train(args):
     env, env_cfg = task_registry.make_env(name=args.task, args=args)
